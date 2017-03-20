@@ -1,0 +1,70 @@
+[1 of 1] Compiling Main             ( /tmp/stack17431/ad-4.3.2.1/Setup.lhs, /tmp/stack17431/ad-4.3.2.1/.stack-work/dist/x86_64-linux-ncurses6/Cabal-1.24.2.0/setup/Main.o )
+
+/tmp/stack17431/ad-4.3.2.1/Setup.lhs:44:69: warning: [-Wdeprecations]
+    In the use of type constructor or class ‘InstalledPackageId’
+    (imported from Distribution.Package):
+    Deprecated: "Use UnitId instead"
+Linking /tmp/stack17431/ad-4.3.2.1/.stack-work/dist/x86_64-linux-ncurses6/Cabal-1.24.2.0/setup/setup ...
+Configuring ad-4.3.2.1...
+Building ad-4.3.2.1...
+Preprocessing library ad-4.3.2.1...
+[ 1 of 33] Compiling Numeric.AD.Mode  ( src/Numeric/AD/Mode.hs, .stack-work/dist/x86_64-linux-ncurses6/Cabal-1.24.2.0/build/Numeric/AD/Mode.o )
+[ 2 of 33] Compiling Numeric.AD.Jet   ( src/Numeric/AD/Jet.hs, .stack-work/dist/x86_64-linux-ncurses6/Cabal-1.24.2.0/build/Numeric/AD/Jet.o )
+[ 3 of 33] Compiling Numeric.AD.Jacobian ( src/Numeric/AD/Jacobian.hs, .stack-work/dist/x86_64-linux-ncurses6/Cabal-1.24.2.0/build/Numeric/AD/Jacobian.o )
+[ 4 of 33] Compiling Numeric.AD.Internal.Type ( src/Numeric/AD/Internal/Type.hs, .stack-work/dist/x86_64-linux-ncurses6/Cabal-1.24.2.0/build/Numeric/AD/Internal/Type.o )
+[ 5 of 33] Compiling Numeric.AD.Internal.Or ( src/Numeric/AD/Internal/Or.hs, .stack-work/dist/x86_64-linux-ncurses6/Cabal-1.24.2.0/build/Numeric/AD/Internal/Or.o )
+
+src/Numeric/AD/Internal/Or.hs:61:1: warning: [-Woverlapping-patterns]
+    Pattern match is redundant
+    In an equation for ‘binary’: binary _ _ _ _ = ...
+
+src/Numeric/AD/Internal/Or.hs:91:3: warning: [-Woverlapping-patterns]
+    Pattern match is redundant
+    In an equation for ‘==’: == _ _ = ...
+
+src/Numeric/AD/Internal/Or.hs:96:3: warning: [-Woverlapping-patterns]
+    Pattern match is redundant
+    In an equation for ‘compare’: compare _ _ = ...
+
+src/Numeric/AD/Internal/Or.hs:107:3: warning: [-Woverlapping-patterns]
+    Pattern match is redundant
+    In an equation for ‘enumFromThen’: enumFromThen _ _ = ...
+
+src/Numeric/AD/Internal/Or.hs:110:3: warning: [-Woverlapping-patterns]
+    Pattern match is redundant
+    In an equation for ‘enumFromTo’: enumFromTo _ _ = ...
+
+src/Numeric/AD/Internal/Or.hs:113:3: warning: [-Woverlapping-patterns]
+    Pattern match is redundant
+    In an equation for ‘enumFromThenTo’: enumFromThenTo _ _ _ = ...
+[ 6 of 33] Compiling Numeric.AD.Internal.On ( src/Numeric/AD/Internal/On.hs, .stack-work/dist/x86_64-linux-ncurses6/Cabal-1.24.2.0/build/Numeric/AD/Internal/On.o )
+[ 7 of 33] Compiling Numeric.AD.Internal.Identity ( src/Numeric/AD/Internal/Identity.hs, .stack-work/dist/x86_64-linux-ncurses6/Cabal-1.24.2.0/build/Numeric/AD/Internal/Identity.o )
+[ 8 of 33] Compiling Numeric.AD.Internal.Combinators ( src/Numeric/AD/Internal/Combinators.hs, .stack-work/dist/x86_64-linux-ncurses6/Cabal-1.24.2.0/build/Numeric/AD/Internal/Combinators.o )
+[ 9 of 33] Compiling Numeric.AD.Internal.Dense ( src/Numeric/AD/Internal/Dense.hs, .stack-work/dist/x86_64-linux-ncurses6/Cabal-1.24.2.0/build/Numeric/AD/Internal/Dense.o )
+[10 of 33] Compiling Numeric.AD.Internal.Forward ( src/Numeric/AD/Internal/Forward.hs, .stack-work/dist/x86_64-linux-ncurses6/Cabal-1.24.2.0/build/Numeric/AD/Internal/Forward.o )
+[11 of 33] Compiling Numeric.AD.Rank1.Forward ( src/Numeric/AD/Rank1/Forward.hs, .stack-work/dist/x86_64-linux-ncurses6/Cabal-1.24.2.0/build/Numeric/AD/Rank1/Forward.o )
+[12 of 33] Compiling Numeric.AD.Mode.Forward ( src/Numeric/AD/Mode/Forward.hs, .stack-work/dist/x86_64-linux-ncurses6/Cabal-1.24.2.0/build/Numeric/AD/Mode/Forward.o )
+[13 of 33] Compiling Numeric.AD.Internal.Forward.Double ( src/Numeric/AD/Internal/Forward/Double.hs, .stack-work/dist/x86_64-linux-ncurses6/Cabal-1.24.2.0/build/Numeric/AD/Internal/Forward/Double.o )
+[14 of 33] Compiling Numeric.AD.Rank1.Forward.Double ( src/Numeric/AD/Rank1/Forward/Double.hs, .stack-work/dist/x86_64-linux-ncurses6/Cabal-1.24.2.0/build/Numeric/AD/Rank1/Forward/Double.o )
+[15 of 33] Compiling Numeric.AD.Mode.Forward.Double ( src/Numeric/AD/Mode/Forward/Double.hs, .stack-work/dist/x86_64-linux-ncurses6/Cabal-1.24.2.0/build/Numeric/AD/Mode/Forward/Double.o )
+[16 of 33] Compiling Numeric.AD.Internal.Kahn ( src/Numeric/AD/Internal/Kahn.hs, .stack-work/dist/x86_64-linux-ncurses6/Cabal-1.24.2.0/build/Numeric/AD/Internal/Kahn.o )
+[17 of 33] Compiling Numeric.AD.Rank1.Kahn ( src/Numeric/AD/Rank1/Kahn.hs, .stack-work/dist/x86_64-linux-ncurses6/Cabal-1.24.2.0/build/Numeric/AD/Rank1/Kahn.o )
+[18 of 33] Compiling Numeric.AD.Mode.Kahn ( src/Numeric/AD/Mode/Kahn.hs, .stack-work/dist/x86_64-linux-ncurses6/Cabal-1.24.2.0/build/Numeric/AD/Mode/Kahn.o )
+[19 of 33] Compiling Numeric.AD.Internal.Reverse ( src/Numeric/AD/Internal/Reverse.hs, .stack-work/dist/x86_64-linux-ncurses6/Cabal-1.24.2.0/build/Numeric/AD/Internal/Reverse.o )
+[20 of 33] Compiling Numeric.AD.Mode.Reverse ( src/Numeric/AD/Mode/Reverse.hs, .stack-work/dist/x86_64-linux-ncurses6/Cabal-1.24.2.0/build/Numeric/AD/Mode/Reverse.o )
+[21 of 33] Compiling Numeric.AD.Internal.Sparse ( src/Numeric/AD/Internal/Sparse.hs, .stack-work/dist/x86_64-linux-ncurses6/Cabal-1.24.2.0/build/Numeric/AD/Internal/Sparse.o )
+[22 of 33] Compiling Numeric.AD.Internal.Tower ( src/Numeric/AD/Internal/Tower.hs, .stack-work/dist/x86_64-linux-ncurses6/Cabal-1.24.2.0/build/Numeric/AD/Internal/Tower.o )
+[23 of 33] Compiling Numeric.AD.Rank1.Tower ( src/Numeric/AD/Rank1/Tower.hs, .stack-work/dist/x86_64-linux-ncurses6/Cabal-1.24.2.0/build/Numeric/AD/Rank1/Tower.o )
+[24 of 33] Compiling Numeric.AD.Mode.Tower ( src/Numeric/AD/Mode/Tower.hs, .stack-work/dist/x86_64-linux-ncurses6/Cabal-1.24.2.0/build/Numeric/AD/Mode/Tower.o )
+[25 of 33] Compiling Numeric.AD.Rank1.Halley ( src/Numeric/AD/Rank1/Halley.hs, .stack-work/dist/x86_64-linux-ncurses6/Cabal-1.24.2.0/build/Numeric/AD/Rank1/Halley.o )
+[26 of 33] Compiling Numeric.AD.Rank1.Newton ( src/Numeric/AD/Rank1/Newton.hs, .stack-work/dist/x86_64-linux-ncurses6/Cabal-1.24.2.0/build/Numeric/AD/Rank1/Newton.o )
+[27 of 33] Compiling Numeric.AD.Newton ( src/Numeric/AD/Newton.hs, .stack-work/dist/x86_64-linux-ncurses6/Cabal-1.24.2.0/build/Numeric/AD/Newton.o )
+[28 of 33] Compiling Numeric.AD.Rank1.Newton.Double ( src/Numeric/AD/Rank1/Newton/Double.hs, .stack-work/dist/x86_64-linux-ncurses6/Cabal-1.24.2.0/build/Numeric/AD/Rank1/Newton/Double.o )
+[29 of 33] Compiling Numeric.AD.Newton.Double ( src/Numeric/AD/Newton/Double.hs, .stack-work/dist/x86_64-linux-ncurses6/Cabal-1.24.2.0/build/Numeric/AD/Newton/Double.o )
+[30 of 33] Compiling Numeric.AD.Rank1.Sparse ( src/Numeric/AD/Rank1/Sparse.hs, .stack-work/dist/x86_64-linux-ncurses6/Cabal-1.24.2.0/build/Numeric/AD/Rank1/Sparse.o )
+[31 of 33] Compiling Numeric.AD.Mode.Sparse ( src/Numeric/AD/Mode/Sparse.hs, .stack-work/dist/x86_64-linux-ncurses6/Cabal-1.24.2.0/build/Numeric/AD/Mode/Sparse.o )
+[32 of 33] Compiling Numeric.AD.Halley ( src/Numeric/AD/Halley.hs, .stack-work/dist/x86_64-linux-ncurses6/Cabal-1.24.2.0/build/Numeric/AD/Halley.o )
+[33 of 33] Compiling Numeric.AD       ( src/Numeric/AD.hs, .stack-work/dist/x86_64-linux-ncurses6/Cabal-1.24.2.0/build/Numeric/AD.o )
+Installing library in
+/home/antystenes/.stack/snapshots/x86_64-linux-ncurses6/lts-8.2/8.0.2/lib/x86_64-linux-ghc-8.0.2/ad-4.3.2.1-AbrgFks1F5uBUs3hOzAEkc
+Registering ad-4.3.2.1...
