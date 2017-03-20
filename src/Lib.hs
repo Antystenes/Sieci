@@ -54,6 +54,8 @@ nandN = Neuron [2, -1.5, -1.5] acFunc
 
 orN = Neuron [-1, 1.5, 1.5] acFunc
 
+-- Picture classification
+
 trainSet :: [(Vector Double, Double)]
 trainSet = [([ 0, 0, 0, 0, 0
               , 0, 1, 1, 0, 0
@@ -128,6 +130,8 @@ train st perc trSet = go st 0 perc (cycle trSet) (length trSet)
 perceptron :: Neuron
 perceptron = Neuron (VS.fromList . replicate 26 $ 1) acFunc
 
+-- Picture recognition
+
 prPrint :: Vector Double -> String
 prPrint = morph (\x (acc, count) -> ((if x == -1 then " " else "*") ++ (if count `mod` 5 == 0 then "\n" else []) ++ acc, count+1)) []
   where
@@ -159,6 +163,7 @@ pics2 :: [String]
 pics2 = [ " *** \n * * \n * * \n *** \n     "
         , "  *  \n  *  \n  *  \n  *  \n  *  "]
 
+-- Gradient Descent
 gradStep :: Floating a => a
 gradStep = 0.01
 
