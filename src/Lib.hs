@@ -19,9 +19,12 @@ import Debug.Trace
 import qualified Numeric.AD as AD
 import Numeric.AD.Internal.Reverse
 import Numeric.LinearAlgebra
+import Numeric.LinearAlgebra.Data
 import qualified Data.Vector.Storable as VS
 import System.Random
 import Debug.Trace
+import Text.Printf
+import Control.Monad
 
 someFunc :: IO ()
 someFunc = putStrLn "someFunc"
@@ -32,14 +35,16 @@ data Neuron = Neuron {
 
 data MNeuron = MNeuron {
                        mw :: Matrix Double,
-                       mf :: Double -> Double
-                       }
+                       mf :: Double -> Double }
 
 instance Show Neuron where
   show = show . w
 
+instance Show MNeuron where
+  show = show . mw
+
 applyMNeuron :: MNeuron -> Vector Double -> Vector Double
-applyMNeuron (MNeuron wagi funkcja) = VS.map funkcja . (wagi #>)
+applyMNeuron (MNeuron wagi funkcja) = VS.map funkcja . (wagi #>) . VS.cons 1
 
 applyNeuron :: Neuron -> Vector Double -> Double
 applyNeuron (Neuron w f) = f . (w <.>) . VS.cons 1
@@ -133,7 +138,7 @@ perceptron = Neuron (VS.fromList . replicate 26 $ 1) acFunc
 -- 3. Picture recognition
 
 prPrint :: Vector Double -> String
-prPrint = morph (\x (acc, count) -> ((if x == -1 then " " else "*") ++ (if count `mod` 5 == 0 then "\n" else []) ++ acc, count+1)) []
+prPrint = morph (\x (acc, count) -> ((if x <= 0 then " " else "*") ++ (if count `mod` 5 == 0 then "\n" else []) ++ acc, count+1)) []
   where
     morph f a = fst . VS.foldr f (a,0)
 
@@ -197,10 +202,10 @@ krok :: Double
 krok = 1
 
 sig :: Double -> Double
-sig = (1/).(1+).exp.negate.(*beta)
+sig = (1/).(1+).exp.negate
 
 dsig :: Double -> Double
-dsig x = beta * sig x * (1 - sig x)
+dsig x = sig x * (1 - sig x)
 
 trainSetXOR :: [(Vector Double, Double)]
 trainSetXOR =
@@ -230,7 +235,6 @@ applyXor ((h1, h2), o) u = applyNeuron o out
     x2 = applyNeuron h2 u
     out= [x1, x2]
 
-
 infixr 3 #*
 (#*) :: Double -> Vector Double -> Vector Double
 x #* v = VS.map (*x) v
@@ -241,11 +245,13 @@ zipWith4 f x y z = zipWith ($) (zipWith3 f x y z)
 trainXOR perc trSet = go 0 perc
   where
     go iters n@((n1@(Neuron w1 f1), n2@(Neuron w2 f2)), n3@(Neuron s f3)) =
-      if eps > (maximum . VS.toList .  VS.map abs $ ((w1 VS.++ w2 VS.++s) - (newW1 VS.++ newW2 VS.++ newS))) then
-        newN
+      if eps > (maximum . VS.toList .  VS.map abs $ difference) then
+        (iters, newN)
       else
+--        (if iters `mod` 10000 == 0 then trace (show iters ++ " iterations. Gradients:\n" ++ unlines [show gradS,show gradW1,show gradW2] ++ "\nDifference:\n" ++ show difference ++ "\n") else id ) $
         go (iters+1) newN
       where
+        difference = (w1 VS.++ w2 VS.++s) - (newW1 VS.++ newW2 VS.++ newS)
         newN =  ((Neuron newW1 f1, Neuron newW2 f2), Neuron newS f3)
         u   = map (VS.cons 1 . fst) trSet
         x1s = map (applyNeuron n1 . fst) trSet
@@ -259,8 +265,107 @@ trainXOR perc trSet = go 0 perc
         gradS = foldr (+) [0,0,0] gradsS
         newS = s - (VS.map (*gradStep) gradS)
         [_,s1,s2] = s
-        grw w sx x y z u= (y-z) * sx * dsig (x<.>s) * dsig (w<.>u) #* u
+        grw w sx x y z u= (y-z) * sx * dsig (x<.>
+                                             s) * dsig (w<.>u) #* u
         gradsW w s = zipWith4 (grw w s) x y z u
         gradW w s = foldr (+) [0,0,0] $ gradsW w s
+        gradW1 = gradW w1 s1
+        gradW2 = gradW w2 s2
         newW1 = w1 - (VS.map (*gradStep) $ gradW w1 s1)
         newW2 = w2 - (VS.map (*gradStep) $ gradW w2 s2)
+
+prettyPrintVals :: [Double] -> String
+prettyPrintVals = unwords . map (printf "%.4f")
+
+-- Zad. 6 Encoder - Decoder
+
+autoEncTrain = map readPic [ "     \n **  \n  *  \n  *  \n  *  "
+                            , "  ** \n   * \n   * \n     \n     "
+                            , "     \n**   \n *   \n *   \n *   "]
+
+type EncDec = (MNeuron, MNeuron)
+
+makeDec (_, MNeuron w _) = MNeuron w acFunc
+
+zeroM inp out = (out><inp) $ replicate (out*inp) 0
+
+--startEncDec :: IO EncDec
+startEncDec = do --(MNeuron (zeroM 26 16) sig, MNeuron (zeroM 17 25) sig) --do
+  m1 <- map (\x -> x - 0.5) <$> replicateM (25*26) (randomIO :: IO Double)
+  m2 <- map (\x -> x - 0.5) <$> replicateM (25*17) (randomIO :: IO Double)
+  return (MNeuron ((16><26) m1) sig, MNeuron ((25><17) m2) sig)
+
+decode (_,a) = applyMNeuron a
+
+encode (a,_) = applyMNeuron a
+
+ende a = applyMNeuron (makeDec a) . encode a
+
+alfa = 0.8
+
+trainED trSet = trainHelp 0
+  where trainHelp old ed@(MNeuron w f1, MNeuron w' f2) =
+          if abs (old - rmse) < 0.000001 then ed
+          else trace ("RMSE = "++ show rmse) $ trainHelp rmse (MNeuron nW f1, MNeuron nW' f2)
+          where nW            = w - cmap (*alfa) gradW
+                nW'           = w'- cmap (*alfa) gradW'
+                diffDecode :: Vector Double -> Vector Double
+                diffDecode    = cmap dsig . (#>) w' . VS.cons 1
+                diffEncode    = cmap dsig . (#>) w  . VS.cons 1
+                gradDec x y x'= let dx = (x' - x) * diffDecode y
+                                in dx `outer` VS.cons 1 y
+                gradEnc x y x'= let dx = (x' - x) * diffDecode y
+                                    dy = VS.tail (tr w' #> dx) * diffEncode x
+                                in dy `outer` VS.cons 1 x
+                triples       = map (\x -> (x, encode ed x,decode ed . encode ed $ x )) trSet
+                gradsW'       = map (\(x,y,x') -> gradDec x y x') triples
+                gradsW        = map (\(x,y,x') -> gradEnc x y x') triples
+                rmse          = sqrt . VS.foldr (+) 0 . foldr (\(x,_,x') acc -> (x-x')^2 +acc ) (fromList . replicate 25 $ 0) $ triples
+                gradW'        = foldr (+) (zeroM 17 25) gradsW'
+                gradW         = foldr (+) (zeroM 26 16) gradsW
+
+-- Zad 7. Sieci Hopfielda
+
+
+readPic2 :: String -> Vector Double
+readPic2 = VS.fromList . foldr (\x acc -> case x of
+                                  ' ' -> 0:acc
+                                  '*' -> 1:acc
+                                  '\n'-> acc) []
+
+jedynka :: Vector Double
+jedynka = readPic2 "     \n **  \n  *  \n  *  \n  *  "
+
+wagi :: Matrix Double
+wagi = cmap (*2) $ (xs `outer` xs) * (cmap ((+1).negate) $ ident 25)
+  where xs = cmap (flip (-) 0.5) jedynka
+
+bias :: Vector Double
+bias = cmap (pred.(/2)) (wagi #> fromList (replicate 25 1))
+
+iteration :: Vector Double -> Vector Double
+iteration = (flip (-) bias).(wagi #>) >>= VS.zipWith (\u x -> if u > 0 then 1 else if u < 0 then 0 else x)
+
+inp :: Vector Double
+inp = readPic2 " *   \n   * \n* *  \n    *\n *   "
+
+process = process . iteration . (prPrint >>= trace)
+
+randInp :: IO (Vector Double)
+randInp = VS.fromList . map (\x -> if x > 0.5 then 1 else 0) <$> replicateM 25 (randomIO :: IO Double)
+
+zeroV :: Vector Double
+zeroV = readPic2 " *** \n * * \n * * \n * * \n *** "
+
+wagi2 :: Matrix Double
+wagi2 = cmap (*2) (((cx `outer` cx) + (dx `outer` dx)) * (cmap ((+1).negate) $ ident 25))
+  where dx = cmap (flip (-) 0.5) zeroV
+        cx = cmap (flip (-) 0.5) jedynka
+
+bias2 :: Vector Double
+bias2 = cmap (pred.pred.(/2)) (wagi2 #> fromList (replicate 25 1))
+
+iterate2 = (flip (-) bias2).(wagi2 #>) >>= VS.zipWith (\u x -> if u > 0 then 1 else if u < 0 then 0 else x)
+
+inp2 :: Vector Double
+inp2 = readPic2 "  *  \n * * \n     \n* *  \n    *"
