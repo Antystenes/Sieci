@@ -1,18 +1,8 @@
 {-# LANGUAGE OverloadedLists#-}
 {-# LANGUAGE RankNTypes#-}
-{-# LANGUAGE Strict#-}
-module Lib
-    ( someFunc
-    , acFunc
-    , applyNeuron
-    , notN
-    , train
-    , perceptron
-    , trainSet
-    , gradDesc
-    , funkcja1
-    , funkcja2
-    ) where
+{-# LANGUAGE ScopedTypeVariables #-}
+--{-# LANGUAGE Strict#-}
+module Lib where
 
 import Control.Monad.ST
 import Debug.Trace
@@ -25,6 +15,8 @@ import System.Random
 import Debug.Trace
 import Text.Printf
 import Control.Monad
+import Control.Concurrent
+import Data.List (permutations)
 
 someFunc :: IO ()
 someFunc = putStrLn "someFunc"
@@ -138,7 +130,7 @@ perceptron = Neuron (VS.fromList . replicate 26 $ 1) acFunc
 -- 3. Picture recognition
 
 prPrint :: Vector Double -> String
-prPrint = morph (\x (acc, count) -> ((if x <= 0 then " " else "*") ++ (if count `mod` 5 == 0 then "\n" else []) ++ acc, count+1)) []
+prPrint = morph (\x (acc, count) -> ((if x <= 0 then " " else "■") ++ (if count `mod` 5 == 0 then "\n" else []) ++ acc, count+1)) []
   where
     morph f a = fst . VS.foldr f (a,0)
 
@@ -160,9 +152,11 @@ picTaker :: MNeuron
 picTaker = MNeuron weights sgn
   where
     [v1, v2] = map readPic pics
-    w1 = map (/25) . VS.foldr (\i acc -> VS.foldr (\j ac -> (i * j) : ac) acc v1) [] $ v1
-    w2 = map (/25) . VS.foldr (\i acc -> VS.foldr (\j ac -> (i * j) : ac) acc v2) [] $ v2
-    weights = (25><25) $ zipWith (+) w1 w2
+    w1       = cmap (/25) (v1 `outer` v1)
+    w2       = cmap (/25) (v2 `outer` v2)
+    weights = w1 + w2
+
+apMNeu2 (MNeuron weights f) = VS.map f . (weights #>)
 
 pics2 :: [String]
 pics2 = [ " *** \n * * \n * * \n *** \n     "
@@ -265,8 +259,7 @@ trainXOR perc trSet = go 0 perc
         gradS = foldr (+) [0,0,0] gradsS
         newS = s - (VS.map (*gradStep) gradS)
         [_,s1,s2] = s
-        grw w sx x y z u= (y-z) * sx * dsig (x<.>
-                                             s) * dsig (w<.>u) #* u
+        grw w sx x y z u= (y-z) * sx * dsig (x<.>s) * dsig (w<.>u) #* u
         gradsW w s = zipWith4 (grw w s) x y z u
         gradW w s = foldr (+) [0,0,0] $ gradsW w s
         gradW1 = gradW w1 s1
@@ -326,7 +319,6 @@ trainED trSet = trainHelp 0
 
 -- Zad 7. Sieci Hopfielda
 
-
 readPic2 :: String -> Vector Double
 readPic2 = VS.fromList . foldr (\x acc -> case x of
                                   ' ' -> 0:acc
@@ -369,3 +361,47 @@ iterate2 = (flip (-) bias2).(wagi2 #>) >>= VS.zipWith (\u x -> if u > 0 then 1 e
 
 inp2 :: Vector Double
 inp2 = readPic2 "  *  \n * * \n     \n* *  \n    *"
+
+-- Boltzmann
+
+prob :: Double -> Double -> Double
+prob t x = (1/).(1+).exp.negate $ (x/t)
+
+boltzStep :: Double -> Vector Double -> IO (Vector Double)
+boltzStep temp = VS.mapM (\x -> randomIO >>= \y -> if y <= prob temp x then return 1 else return 0).(flip (-) bias).(wagi#>)
+
+--replicateIO :: (a -> IO a) -> a -> IO [a]
+--replicateIO f a = [ a : rest | rest <- replicateIO f nA , nA <- f a ]
+
+annealing :: Double -> Vector Double -> IO ()
+annealing = aSt 0
+
+aSt :: Double -> Double -> Vector Double -> IO ()
+aSt x inT input = do
+  nv <- boltzStep (tann inT x) input
+  threadDelay 300000
+  putStrLn $ "Step number: " ++ show x
+  putStrLn $ "Temperature: " ++ show (tann inT x)
+  putStrLn . prPrint $ input
+  aSt (x+1) inT nv
+
+bSt :: Double -> Vector Double -> IO ()
+bSt temp input = do
+  nv <- boltzStep temp input
+  threadDelay 300000
+  putStrLn . prPrint $ input
+  bSt temp nv
+
+tann :: Double -> Double -> Double
+tann t = (t/).(1+).log.(1+)
+
+-- TSP
+
+randomPermutation :: Int -> IO [Int]
+randomPermutation n = do
+  let ps= permutations [0..n-1]
+      x = length ps
+  r <- randomRIO (0,x-1) :: IO Int
+  return $ ps !! r
+
+odleglosci1 = cmap abs (row [1..10] - col [1..10]) - (col (8:replicate 9 0) * row (replicate 9 0 ++ [1])) - (col (replicate 9 0++[8]) * row (1 : replicate 9 0))
